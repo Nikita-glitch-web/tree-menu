@@ -8,6 +8,6 @@ export interface TreeNodeProps {
   node: TreeNodeType;
   selectedNode: string | null;
   onSelect: (id: string | null) => void;
-  onToggle: (id: string) => void; // Добавляем этот пропс
+  onToggle: (id: string) => void;
   expandedNodes: Set<string>;
 }

@@ -1,64 +1,56 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
 import { TreeNodeType } from "../../types/treeTypes";
+import TreeActions from "../TreeActions/TreeActions";
 
 type TreeNodeProps = {
   node: TreeNodeType;
   selectedNode: string | null;
   onSelect: (id: string) => void;
-  onToggle: (id: string) => void;
-  expandedNodes: Set<string>;
+  onAdd: (parentId: string) => void;
+  onDelete: (id: string) => void;
 };
 
 const TreeNode: React.FC<TreeNodeProps> = ({
   node,
   selectedNode,
   onSelect,
-  onToggle,
-  expandedNodes,
+  onAdd,
+  onDelete,
 }) => {
-  const isExpanded = expandedNodes.has(node.id);
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <li className="ml-4">
       <div
-        className={`cursor-pointer hover:bg-gray-200 p-1 rounded flex items-center ${
+        className={`cursor-pointer hover:bg-gray-200 p-1 rounded flex items-center gap-1 ${
           selectedNode === node.id ? "bg-blue-300" : ""
         }`}
         onClick={() => onSelect(node.id)}
       >
         {node.children.length > 0 && (
-          <button
-            className="mr-2 focus:outline-none"
-            onClick={(e) => {
-              e.stopPropagation(); // Предотвращаем срабатывание onSelect
-              onToggle(node.id);
-            }}
-          >
-            {isExpanded ? "▼" : "▶"}
-          </button>
+          <span className="mr-1" onClick={() => setExpanded(!expanded)}>
+            {expanded ? "▼" : "▶"}
+          </span>
         )}
         {node.label}
+        <TreeActions
+          onAdd={() => onAdd(node.id)}
+          onDelete={() => onDelete(node.id)}
+        />
       </div>
-
-      {isExpanded && node.children.length > 0 && (
-        <motion.ul
-          className="ml-4 overflow-hidden"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-        >
+      {expanded && node.children.length > 0 && (
+        <ul className="ml-4">
           {node.children.map((child) => (
             <TreeNode
               key={child.id}
               node={child}
               selectedNode={selectedNode}
               onSelect={onSelect}
-              onToggle={onToggle}
-              expandedNodes={expandedNodes}
+              onAdd={onAdd}
+              onDelete={onDelete}
             />
           ))}
-        </motion.ul>
+        </ul>
       )}
     </li>
   );
