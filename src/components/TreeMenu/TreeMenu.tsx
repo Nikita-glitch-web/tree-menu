@@ -50,7 +50,7 @@ const TreeMenu: React.FC = () => {
 
   return (
     <div className="p-4 bg-gray-100 rounded-lg">
-      <h2 className="text-lg font-semibold mb-2">Catalog</h2>
+      <h2 className="text-lg font-semibold mb-2">Item</h2>
       <ul>
         {treeData.map((node) => (
           <TreeNode
