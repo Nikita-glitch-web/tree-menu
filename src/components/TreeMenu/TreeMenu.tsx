@@ -60,7 +60,6 @@ const TreeMenu: React.FC = () => {
     <div className="p-4 bg-gray-100 rounded-lg">
       <h2 className="text-lg font-semibold mb-2">Дерево меню</h2>
 
-      {/* Анімація для кнопок */}
       <motion.div
         className="mb-2"
         initial={{ opacity: 0, y: -10 }}
