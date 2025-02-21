@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { TreeNodeType } from "../../types/treeTypes";
 import TreeActions from "../TreeActions/TreeActions";
+import styles from "./TreeNode.module.css";
 
 type TreeNodeProps = {
   node: TreeNodeType;
@@ -20,15 +21,18 @@ const TreeNode: React.FC<TreeNodeProps> = ({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <li className="ml-4">
+    <li className={styles.treeNode}>
       <div
-        className={`cursor-pointer hover:bg-gray-200 p-1 rounded flex items-center gap-1 ${
-          selectedNode === node.id ? "bg-blue-300" : ""
+        className={`${styles.node} ${
+          selectedNode === node.id ? styles.selected : ""
         }`}
         onClick={() => onSelect(node.id)}
       >
         {node.children.length > 0 && (
-          <span className="mr-1" onClick={() => setExpanded(!expanded)}>
+          <span
+            className={styles.toggle}
+            onClick={() => setExpanded(!expanded)}
+          >
             {expanded ? "▼" : "▶"}
           </span>
         )}
@@ -39,7 +43,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
         />
       </div>
       {expanded && node.children.length > 0 && (
-        <ul className="ml-4">
+        <ul className={styles.children}>
           {node.children.map((child) => (
             <TreeNode
               key={child.id}

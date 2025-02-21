@@ -1,0 +1,33 @@
+.treeMenu {
+  padding: 16px;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.actionsContainer {
+  margin-bottom: 8px;
+}
+
+.treeList {
+  list-style: none;
+  padding: 0;
+}
+
+.treeItem {
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+.treeItem:hover {
+  transform: scale(1.02);
+}
+
+.selectedNode {
+  margin-top: 8px;
+  font-weight: 500;
+}

@@ -2,17 +2,17 @@ import React, { useState } from "react";
 import { TreeNodeType } from "../../types/treeTypes";
 import TreeNode from "../TreeNode/TreeNode";
 import TreeActions from "../TreeActions/TreeActions";
-import { motion, AnimatePresence } from "framer-motion";
+import styles from "./TreeMenu.module.css";
 
 const TreeMenu: React.FC = () => {
   const [treeData, setTreeData] = useState<TreeNodeType[]>([
     {
       id: "1",
-      label: "Головний розділ 1",
+      label: "Main",
       children: [
-        { id: "2", label: "Підрозділ 1.1", children: [] },
-        { id: "3", label: "Підрозділ 1.2", children: [] },
-        { id: "4", label: "Підрозділ 1.3", children: [] },
+        { id: "2", label: "Sub", children: [] },
+        { id: "3", label: "Sub", children: [] },
+        { id: "4", label: "Sub", children: [] },
       ],
     },
   ]);
@@ -21,16 +21,16 @@ const TreeMenu: React.FC = () => {
 
   const addNode = (parentId?: string) => {
     setTreeData((prev) => {
+      const isTopLevel = !parentId || prev.some((node) => node.id === parentId);
+
       const newNode: TreeNodeType = {
         id: Date.now().toString(),
-        label: parentId
-          ? `Підрозділ ${Date.now()}`
-          : `Головний розділ ${Date.now()}`,
+        label: isTopLevel ? `Main ${Date.now()}` : `Sub ${Date.now()}`,
         children: [],
       };
 
       if (!parentId) {
-        return [...prev, newNode];
+        return [...prev, newNode]; // Добавляем в корень
       }
 
       const updateTree = (nodes: TreeNodeType[]): TreeNodeType[] =>
@@ -57,49 +57,29 @@ const TreeMenu: React.FC = () => {
   };
 
   return (
-    <div className="p-4 bg-gray-100 rounded-lg">
-      <h2 className="text-lg font-semibold mb-2">Дерево меню</h2>
+    <div className={styles.treeMenu}>
+      <h2 className={styles.title}>Tree menu</h2>
 
-      <motion.div
-        className="mb-2"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
+      <div className={styles.actionsContainer}>
         <TreeActions onAdd={() => addNode()} onDelete={() => {}} />
-      </motion.div>
+      </div>
 
-      <ul>
-        <AnimatePresence>
-          {treeData.map((node) => (
-            <motion.li
-              key={node.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.2 }}
-            >
-              <TreeNode
-                node={node}
-                selectedNode={selectedNode}
-                onSelect={setSelectedNode}
-                onAdd={addNode}
-                onDelete={deleteNode}
-              />
-            </motion.li>
-          ))}
-        </AnimatePresence>
+      <ul className={styles.treeList}>
+        {treeData.map((node) => (
+          <li key={node.id} className={styles.treeItem}>
+            <TreeNode
+              node={node}
+              selectedNode={selectedNode}
+              onSelect={setSelectedNode}
+              onAdd={addNode}
+              onDelete={deleteNode}
+            />
+          </li>
+        ))}
       </ul>
 
       {selectedNode && (
-        <motion.p
-          className="mt-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          Вибрано: {selectedNode}
-        </motion.p>
+        <p className={styles.selectedNode}>Selected {selectedNode}</p>
       )}
     </div>
   );
