@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { TreeNodeType } from "../../types/treeTypes";
+import { TreeNodeType, FlatTreeType } from "../../types/treeTypes";
 import TreeActions from "../TreeActions/TreeActions";
 import styles from "./TreeNode.module.css";
 
 type TreeNodeProps = {
   node: TreeNodeType;
+  treeData: FlatTreeType;
   selectedNode: string | null;
   onSelect: (id: string) => void;
   onAdd: (parentId: string) => void;
@@ -13,12 +14,17 @@ type TreeNodeProps = {
 
 const TreeNode: React.FC<TreeNodeProps> = ({
   node,
+  treeData,
   selectedNode,
   onSelect,
   onAdd,
   onDelete,
 }) => {
   const [expanded, setExpanded] = useState(false);
+
+  const children = node.children
+    .map((childId) => treeData[childId])
+    .filter(Boolean);
 
   return (
     <li className={styles.treeNode}>
@@ -28,10 +34,13 @@ const TreeNode: React.FC<TreeNodeProps> = ({
         }`}
         onClick={() => onSelect(node.id)}
       >
-        {node.children.length > 0 && (
+        {children.length > 0 && (
           <span
             className={styles.toggle}
-            onClick={() => setExpanded(!expanded)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded(!expanded);
+            }}
           >
             {expanded ? "▼" : "▶"}
           </span>
@@ -42,12 +51,13 @@ const TreeNode: React.FC<TreeNodeProps> = ({
           onDelete={() => onDelete(node.id)}
         />
       </div>
-      {expanded && node.children.length > 0 && (
-        <ul className={styles.children}>
-          {node.children.map((child) => (
+      {expanded && children.length > 0 && (
+        <ul className={`${styles.children} ${expanded ? styles.open : ""}`}>
+          {children.map((child) => (
             <TreeNode
               key={child.id}
               node={child}
+              treeData={treeData}
               selectedNode={selectedNode}
               onSelect={onSelect}
               onAdd={onAdd}

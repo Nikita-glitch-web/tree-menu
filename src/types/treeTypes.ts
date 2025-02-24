@@ -1,7 +1,11 @@
 export interface TreeNodeType {
   id: string;
   label: string;
-  children: TreeNodeType[];
+  children: string[];
+}
+
+export interface FlatTreeType {
+  [key: string]: TreeNodeType;
 }
 
 export interface TreeNodeProps {

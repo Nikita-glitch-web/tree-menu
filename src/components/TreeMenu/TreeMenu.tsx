@@ -1,59 +1,76 @@
 import React, { useState } from "react";
-import { TreeNodeType } from "../../types/treeTypes";
+import { FlatTreeType } from "../../types/treeTypes";
 import TreeNode from "../TreeNode/TreeNode";
 import TreeActions from "../TreeActions/TreeActions";
 import styles from "./TreeMenu.module.css";
 
-const TreeMenu: React.FC = () => {
-  const [treeData, setTreeData] = useState<TreeNodeType[]>([
-    {
-      id: "1",
-      label: "Main",
-      children: [
-        { id: "2", label: "Sub", children: [] },
-        { id: "3", label: "Sub", children: [] },
-        { id: "4", label: "Sub", children: [] },
-      ],
-    },
-  ]);
+const initialTreeData: FlatTreeType = {
+  tt12378: {
+    id: "tt12378",
+    label: "Main",
+    children: ["qwert456", "3"],
+  },
+  qwert456: { id: "qwert456", label: "Sub", children: ["5"] },
+  "3": { id: "3", label: "Sub", children: ["4"] },
+  "4": { id: "4", label: "Sub", children: [] },
+  "5": { id: "5", label: "Sub", children: [] },
+};
 
+const TreeMenu: React.FC = () => {
+  const [treeData, setTreeData] = useState<FlatTreeType>(initialTreeData);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
   const addNode = (parentId?: string) => {
+    const newId = Date.now().toString();
+    const newNode = {
+      id: newId,
+      label: parentId ? `Sub ${newId}` : `Main ${newId}`,
+      children: [],
+    };
+
     setTreeData((prev) => {
-      const isTopLevel = !parentId || prev.some((node) => node.id === parentId);
-
-      const newNode: TreeNodeType = {
-        id: Date.now().toString(),
-        label: isTopLevel ? `Main ${Date.now()}` : `Sub ${Date.now()}`,
-        children: [],
-      };
-
       if (!parentId) {
-        return [...prev, newNode]; // Добавляем в корень
+        return { ...prev, [newId]: newNode };
       }
-
-      const updateTree = (nodes: TreeNodeType[]): TreeNodeType[] =>
-        nodes.map((node) => {
-          if (node.id === parentId) {
-            return { ...node, children: [...node.children, newNode] };
-          }
-          return { ...node, children: updateTree(node.children) };
-        });
-
-      return updateTree(prev);
+      return {
+        ...prev,
+        [newId]: newNode,
+        [parentId]: {
+          ...prev[parentId],
+          children: [...prev[parentId].children, newId],
+        },
+      };
     });
   };
 
   const deleteNode = (id: string) => {
     setTreeData((prev) => {
-      const removeNode = (nodes: TreeNodeType[]): TreeNodeType[] =>
-        nodes
-          .filter((node) => node.id !== id)
-          .map((node) => ({ ...node, children: removeNode(node.children) }));
-
-      return removeNode(prev);
+      const newTree = { ...prev };
+      delete newTree[id];
+      Object.keys(newTree).forEach((key) => {
+        newTree[key].children = newTree[key].children.filter(
+          (childId) => childId !== id
+        );
+      });
+      return newTree;
     });
+  };
+
+  const renderTree = (nodeId: string) => {
+    const node = treeData[nodeId];
+    if (!node) return null;
+
+    return (
+      <TreeNode
+        key={node.id}
+        node={node}
+        treeData={treeData}
+        selectedNode={selectedNode}
+        onSelect={setSelectedNode}
+        onAdd={addNode}
+        onDelete={deleteNode}
+      />
+    );
   };
 
   return (
@@ -65,17 +82,14 @@ const TreeMenu: React.FC = () => {
       </div>
 
       <ul className={styles.treeList}>
-        {treeData.map((node) => (
-          <li key={node.id} className={styles.treeItem}>
-            <TreeNode
-              node={node}
-              selectedNode={selectedNode}
-              onSelect={setSelectedNode}
-              onAdd={addNode}
-              onDelete={deleteNode}
-            />
-          </li>
-        ))}
+        {Object.keys(treeData)
+          .filter(
+            (id) =>
+              !Object.values(treeData).some((node) =>
+                node.children.includes(id)
+              )
+          )
+          .map((rootId) => renderTree(rootId))}
       </ul>
 
       {selectedNode && (
