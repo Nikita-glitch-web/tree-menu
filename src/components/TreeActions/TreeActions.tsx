@@ -9,14 +9,10 @@ type TreeActionsProps = {
 const TreeActions: React.FC<TreeActionsProps> = ({ onAdd, onDelete }) => {
   return (
     <div className={styles.actionsContainer}>
-      <button className={styles.actionButton} onClick={onAdd} title="Додати">
+      <button className={styles.actionButton} onClick={onAdd} title="Add">
         +
       </button>
-      <button
-        className={styles.actionButton}
-        onClick={onDelete}
-        title="Видалити"
-      >
+      <button className={styles.actionButton} onClick={onDelete} title="Delete">
         -
       </button>
     </div>
